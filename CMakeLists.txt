@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+project( PanoramaMaker )
+find_package( OpenCV )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+add_executable( PanoramaMaker PanoramaMaker.cpp )
+target_link_libraries( PanoramaMaker ${OpenCV_LIBS} )
