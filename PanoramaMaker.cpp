@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
     Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("FlannBased");
     for (int i = 0; i < argc - 2; i ++){
         cout << "Hello " << i << endl;
-        matcher->match(descriptors[i], descriptors[i+1], matches[i]);
+        matcher->knnMatch(descriptors[i], descriptors[i+1], matches, 1);
         cout << "End " << i << endl;
     }
 
