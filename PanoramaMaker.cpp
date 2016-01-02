@@ -30,9 +30,8 @@ int main(int argc, const char * argv[]) {
     }
     
     vector<Mat> srcImg_Grayed;
-    Mat result, result1, result2;
+    Mat result, result1, result2, result3, result4, result5;
     namedWindow("Panorama");
-    std::stringstream sr, si1, si2;
     
     for (int i = 1; i < argc; i++){
         Mat grayedImg;
@@ -44,8 +43,17 @@ int main(int argc, const char * argv[]) {
     makePanorama(srcImg_Grayed[3], srcImg_Grayed[2], result2);
     testCropB(result2);
     
-    makePanorama(result2, result1, result);
+    makePanorama(srcImg_Grayed[4], result2, result4);
+    testCropB(result4);
+    
+    makePanorama(result4, result1, result);
+    testCropB(result);
+    
+    //makePanorama(result2, result1, result);
+    
+    imwrite("5 Picture Panorama.jpg", result);
     imshow("Panorama", result);
+    
     waitKey(0);
     
 }
@@ -110,14 +118,12 @@ void testCropB(cv::Mat& image)
     cv::Mat gray;
     cvtColor(image, gray, CV_BGR2GRAY);
     
-    int minCol = 0;
-    int minRow = 0;
     int maxCol = gray.cols;
     int maxRow = gray.rows;
     bool noBlackPixels = true;
     
-    cout << "A: " << minCol << " " << maxCol << " " << endl;
-    cout << "A: " << minRow << " " << maxRow << " " << endl;
+    cout << "A: " << maxCol << " " << endl;
+    cout << "A: " << maxRow << " " << endl;
     
     for (int i = gray.cols; i > 0; i--)
     {
@@ -135,9 +141,9 @@ void testCropB(cv::Mat& image)
         
     }
     
-    cout << "B: " << minCol << " " << maxCol << " " << endl;
-    cout << "B: " << minRow << " " << maxRow << " " << endl;
+    cout << "B: " << maxCol << " " << endl;
+    cout << "B: " << maxRow << " " << endl;
     
-    cv::Rect cropRect = Rect(minCol, minRow, maxCol, gray.rows);
+    cv::Rect cropRect = Rect(0, 0, maxCol, gray.rows);
     image = image(cropRect);
 }
