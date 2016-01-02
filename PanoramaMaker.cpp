@@ -17,10 +17,11 @@
 using namespace std;
 using namespace cv;
 
-void makePanorama(Mat, Mat);
+void makePanorama(Mat, Mat, Mat &);
 void findKeypointsAndDescriptors (Mat, Mat, vector<KeyPoint> &, Mat &, vector<KeyPoint> &, Mat &);
 void findMatchedPoints (vector<KeyPoint> &, Mat &, vector<KeyPoint> &, Mat &, vector<DMatch> &, vector<Point2f> &, vector<Point2f> &);
 void stitchTogether (Mat, Mat, vector<Point2f> &, vector<Point2f> &, Mat &);
+void testCropB (Mat &);
 
 int main(int argc, const char * argv[]) {
     if (argc < 3){
@@ -29,21 +30,38 @@ int main(int argc, const char * argv[]) {
     }
     
     vector<Mat> srcImg_Grayed;
+    Mat result;
+    namedWindow("Panorama");
+    std::stringstream sr, si1, si2;
     
-    for (int i = argc-1; i > 0; i--){
+    for (int i = 1; i < argc; i++){
         Mat grayedImg;
-        //cvtColor(imread(argv[i]), grayedImg, CV_RGB2GRAY);
         srcImg_Grayed.push_back(imread(argv[i]));
+        if (i > 1){
+            cout << "Start " << i << endl;
+            /*if (i == 4){
+                imshow("FOURTH RESULT PREV", srcImg_Grayed.at(i-2));
+                imshow("FOURTH NEXT TO STITCH", srcImg_Grayed.at(i-1));
+                usleep(100000000);
+            }*/
+            makePanorama(srcImg_Grayed.at(i-1), srcImg_Grayed.at(i-2), result);
+            cout << "Middle PART I " << i << endl;
+            testCropB(result);
+            cout << " Middle PART II " << i << endl;
+            srcImg_Grayed.at(i-1) = result;
+            cout << "Done " << i << endl;
+        }
     }
     
-    makePanorama(srcImg_Grayed[0], srcImg_Grayed[1]);
+    imshow("Panorama", result);
+    waitKey(0);
     
 }
 
-void makePanorama(Mat imgObj, Mat imgScene){
+void makePanorama(Mat imgObj, Mat imgScene, Mat & result){
     
     vector<KeyPoint> objKeypoints, sceneKeypoints;
-    Mat drawnKeypoints, objDescriptors, sceneDescriptors, result;
+    Mat drawnKeypoints, objDescriptors, sceneDescriptors;
     vector<DMatch> matches;
     vector<Point2f> objMatchedPoints, sceneMatchedPoints;
     
@@ -52,9 +70,6 @@ void makePanorama(Mat imgObj, Mat imgScene){
     findMatchedPoints(objKeypoints, objDescriptors, sceneKeypoints, sceneDescriptors, matches, objMatchedPoints, sceneMatchedPoints);
     
     stitchTogether(imgObj, imgScene, objMatchedPoints, sceneMatchedPoints, result);
-    
-    imshow("Display Test", result);
-    waitKey(0);
 }
 
 //Finding keypoints & descriptors using SURF
@@ -98,3 +113,39 @@ void stitchTogether (Mat imgO, Mat imgS, vector<Point2f> &oP, vector<Point2f> &s
     imgS.copyTo(half);
 }
 
+void testCropB(cv::Mat& image)
+{
+    cv::Mat gray;
+    cvtColor(image, gray, CV_BGR2GRAY);
+    
+    int minCol = 0;
+    int minRow = 0;
+    int maxCol = gray.cols;
+    int maxRow = gray.rows;
+    bool noBlackPixels = true;
+    
+    cout << "F: " << minCol << " " << maxCol << " " << endl;
+    cout << "F: " << minRow << " " << maxRow << " " << endl;
+    
+    for (int i = gray.cols; i > 0; i--)
+    {
+        noBlackPixels = true;
+        for (int j = 0; j < gray.rows && noBlackPixels; j++)
+        {
+            if (gray.at<char>(j, i) == 0)
+            {
+                noBlackPixels = false;
+            }
+        }
+        if (!noBlackPixels && maxCol <= gray.cols){
+            maxCol--;
+        }
+        
+    }
+    
+    cout << "F: " << minCol << " " << maxCol << " " << endl;
+    cout << "F: " << minRow << " " << maxRow << " " << endl;
+    
+    cv::Rect cropRect = Rect(minCol, minRow, maxCol, gray.rows);
+    image = image(cropRect);
+}
