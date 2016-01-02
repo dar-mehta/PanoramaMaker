@@ -30,29 +30,21 @@ int main(int argc, const char * argv[]) {
     }
     
     vector<Mat> srcImg_Grayed;
-    Mat result;
+    Mat result, result1, result2;
     namedWindow("Panorama");
     std::stringstream sr, si1, si2;
     
     for (int i = 1; i < argc; i++){
         Mat grayedImg;
         srcImg_Grayed.push_back(imread(argv[i]));
-        if (i > 1){
-            cout << "Start " << i << endl;
-            /*if (i == 4){
-                imshow("FOURTH RESULT PREV", srcImg_Grayed.at(i-2));
-                imshow("FOURTH NEXT TO STITCH", srcImg_Grayed.at(i-1));
-                usleep(100000000);
-            }*/
-            makePanorama(srcImg_Grayed.at(i-1), srcImg_Grayed.at(i-2), result);
-            cout << "Middle PART I " << i << endl;
-            testCropB(result);
-            cout << " Middle PART II " << i << endl;
-            srcImg_Grayed.at(i-1) = result;
-            cout << "Done " << i << endl;
-        }
     }
     
+    makePanorama(srcImg_Grayed[1], srcImg_Grayed[0], result1);
+    testCropB(result1);
+    makePanorama(srcImg_Grayed[3], srcImg_Grayed[2], result2);
+    testCropB(result2);
+    
+    makePanorama(result2, result1, result);
     imshow("Panorama", result);
     waitKey(0);
     
@@ -124,8 +116,8 @@ void testCropB(cv::Mat& image)
     int maxRow = gray.rows;
     bool noBlackPixels = true;
     
-    cout << "F: " << minCol << " " << maxCol << " " << endl;
-    cout << "F: " << minRow << " " << maxRow << " " << endl;
+    cout << "A: " << minCol << " " << maxCol << " " << endl;
+    cout << "A: " << minRow << " " << maxRow << " " << endl;
     
     for (int i = gray.cols; i > 0; i--)
     {
@@ -143,8 +135,8 @@ void testCropB(cv::Mat& image)
         
     }
     
-    cout << "F: " << minCol << " " << maxCol << " " << endl;
-    cout << "F: " << minRow << " " << maxRow << " " << endl;
+    cout << "B: " << minCol << " " << maxCol << " " << endl;
+    cout << "B: " << minRow << " " << maxRow << " " << endl;
     
     cv::Rect cropRect = Rect(minCol, minRow, maxCol, gray.rows);
     image = image(cropRect);
