@@ -21,7 +21,7 @@ void makePanorama(Mat, Mat, Mat &);
 void findKeypointsAndDescriptors (Mat, Mat, vector<KeyPoint> &, Mat &, vector<KeyPoint> &, Mat &);
 void findMatchedPoints (vector<KeyPoint> &, Mat &, vector<KeyPoint> &, Mat &, vector<DMatch> &, vector<Point2f> &, vector<Point2f> &);
 void stitchTogether (Mat, Mat, vector<Point2f> &, vector<Point2f> &, Mat &);
-void testCropB (Mat &);
+void cropImg (Mat &);
 
 int main(int argc, const char * argv[]) {
     if (argc < 3){
@@ -39,15 +39,15 @@ int main(int argc, const char * argv[]) {
     }
     
     makePanorama(srcImg_Grayed[1], srcImg_Grayed[0], result1);
-    testCropB(result1);
+    cropImg(result1);
     makePanorama(srcImg_Grayed[3], srcImg_Grayed[2], result2);
-    testCropB(result2);
+    cropImg(result2);
     
     makePanorama(srcImg_Grayed[4], result2, result4);
-    testCropB(result4);
+    cropImg(result4);
     
     makePanorama(result4, result1, result);
-    testCropB(result);
+    cropImg(result);
     
     //makePanorama(result2, result1, result);
     
@@ -113,7 +113,7 @@ void stitchTogether (Mat imgO, Mat imgS, vector<Point2f> &oP, vector<Point2f> &s
     imgS.copyTo(half);
 }
 
-void testCropB(cv::Mat& image)
+void cropImg(cv::Mat& image)
 {
     cv::Mat gray;
     cvtColor(image, gray, CV_BGR2GRAY);
