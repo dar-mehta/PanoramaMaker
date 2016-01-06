@@ -119,11 +119,7 @@ void cropImg(cv::Mat& image)
     cvtColor(image, gray, CV_BGR2GRAY);
     
     int maxCol = gray.cols;
-    int maxRow = gray.rows;
     bool noBlackPixels = true;
-    
-    cout << "A: " << maxCol << " " << endl;
-    cout << "A: " << maxRow << " " << endl;
     
     for (int i = gray.cols; i > 0; i--)
     {
@@ -140,9 +136,6 @@ void cropImg(cv::Mat& image)
         }
         
     }
-    
-    cout << "B: " << maxCol << " " << endl;
-    cout << "B: " << maxRow << " " << endl;
     
     cv::Rect cropRect = Rect(0, 0, maxCol, gray.rows);
     image = image(cropRect);
